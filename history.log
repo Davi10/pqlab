@@ -1570,3 +1570,65 @@ O pqLAB é uma ferramenta de organização de pesquisa qualitativa desenvolvida 
 ================================================================================
 Fim do histórico — 183 mensagens
 ================================================================================
+
+[0184] Deploy no GitHub Pages — ombudsmanviktor/pqlab
+Data: 2026-03-15
+Tipo: devops / infraestrutura
+
+Repositório git inicializado localmente e conectado ao remoto ombudsmanviktor/pqlab.
+Criado .gitignore excluindo node_modules/, dist/, .env e arquivos temporários.
+71 arquivos commitados no commit inicial "feat: initial commit — pqLAB v0.1.0".
+Integração do histórico remoto (LICENSE + README.md criados pelo GitHub) via pull --allow-unrelated-histories.
+
+Criado .github/workflows/deploy.yml:
+- Trigger: push para branch main
+- Jobs: build (npm ci + npm run build) → deploy (actions/deploy-pages@v4)
+- Permissões: pages: write, id-token: write
+- Artefato: pasta dist/ gerada pelo Vite
+
+Ajustes de configuração:
+- vite.config.ts: base alterado de './' para '/' (domínio personalizado CNAME pqlab.ombudsmanviktor.me)
+- CNAME detectado no repositório remoto — confirma domínio customizado já configurado pelo usuário
+
+Correção de erros TypeScript que quebravam o build no CI:
+- MapaConhecimento.tsx:226: `tick` renomeado para `_tick` (variável de re-render nunca lida diretamente)
+- MarkdownEditor.tsx:300: prop `className` removida de WikiMarkdown (declarada mas nunca passada nem usada)
+- Build local confirmado antes do push: `npm run build` ✓ (dist/ gerado em 4.11s, 2466 módulos)
+
+Resultado: GitHub Actions run #6 "Deploy pqLAB to GitHub Pages" completou com status success.
+App disponível em https://pqlab.ombudsmanviktor.me
+
+Instrução manual necessária (uma vez): Settings → Pages → Source → "GitHub Actions"
+
+[0185] Consulta: estrutura de dados no repositório privado
+Data: 2026-03-15
+Tipo: documentação / consulta
+
+Usuário perguntou sobre a estrutura de arquivos criada automaticamente no repositório privado.
+Explicação fornecida:
+- Um arquivo .yaml por registro, organizado em pastas por módulo
+- Estrutura: data/diario/, data/bookmarks/, data/rssfeeds/, data/fichamentos/, data/planos/, data/listas/, data/listassimples/
+- Anexos binários em attachments/{module}/{id}/{filename}
+- Cada salvamento gera um commit no repositório — histórico de versões automático
+- Textos longos em Markdown ficam inline no YAML com bloco literal (|)
+- Exemplo de fichamento YAML mostrado com campos: id, title, authors, year, journal, summary, subEntries, created_at, updated_at
+
+[0186] Consulta: permissões do PAT GitHub
+Data: 2026-03-15
+Tipo: documentação / consulta
+
+Usuário perguntou quais permissões o Personal Access Token precisa.
+Resposta: escopo `repo` (classic token) é suficiente e necessário.
+Justificativa: todas as operações usam a API REST do GitHub Contents
+(GET/PUT/DELETE /repos/{owner}/{repo}/contents/{path}).
+Para repositório privado, `public_repo` não é suficiente — precisa de `repo` completo.
+Token armazenado apenas no localStorage do navegador sob a chave `pqlab_github_config`.
+Nunca trafega por servidor externo.
+
+[0187] Atualização do history.log
+Data: 2026-03-15
+Tipo: manutenção
+
+================================================================================
+Fim do histórico — 187 mensagens
+================================================================================
